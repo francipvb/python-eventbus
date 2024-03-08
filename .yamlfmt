@@ -1,0 +1,7 @@
+formatter:
+    type: basic
+    indent: 2
+    max_line_length: 120
+    indentless_arrays: true
+
+gitignore_excludes: true
