@@ -1,0 +1,20 @@
+site_name: Python EventBus
+site_description: Fully typed event bus python implementation.
+site_author: Francisco R. Del Rio
+
+plugins:
+- search
+- mkdocstrings
+
+markdown_extensions:
+- mkdocs-typer
+
+theme:
+  name: material
+
+watch:
+- src/eventbus
+- docs
+
+repo_url: https://github.com/francipvb/python-eventbus
+copyright: Copyright (C) 2024 by Francisco R. Del Roio

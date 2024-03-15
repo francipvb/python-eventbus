@@ -1,0 +1,67 @@
+on:
+  push:
+    tags:
+    - v*
+    branches:
+    - develop
+    - main
+
+  pull_request:
+    branches:
+    - develop
+    - main
+
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+        cache: pip
+
+    - name: Setup Pages
+      id: pages
+      uses: actions/configure-pages@v4
+    - uses: actions/cache@v4
+      id: cache
+      with:
+        path: .venv
+        key: ${{ runner.os }}-${{ hashFiles('pyproject.toml', 'poetry.lock') }}
+
+    - run: pip install poetry~=1.8.0
+      name: Install poetry
+    - run: poetry install --without dev
+      name: Install dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
+
+    - id: build-docs
+      name: Build documentation
+      run: poetry run mkdocs build -s
+
+    - name: Upload artifact
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./site
+
+  deploy-pages:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build-docs]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - id: deployment
+      uses: actions/deploy-pages@v4
+      with:
+        preview: ${{ ! startsWith(github.ref, 'refs/tags/') }}
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
